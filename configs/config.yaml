@@ -1,0 +1,8 @@
+server:
+  bind: "0.0.0.0"       # Ошибка: привязка ко всем интерфейсам
+  tls: false            # Ошибка: выключен TLS
+  log_level: "debug"    # Ошибка: debug режим в логах
+
+database:
+  password: "supersecret" # Ошибка: пароль в открытом виде
+  algorithm: "md5"        # Ошибка: слабый алгоритм шифрования

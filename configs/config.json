@@ -1,0 +1,23 @@
+{
+  "server": {
+    "listen_address": "0.0.0.0",
+    "port": 8080,
+    "tls": {
+      "enabled": false,
+      "insecure_skip_verify": true
+    }
+  },
+  "database": {
+    "host": "localhost",
+    "password": "super_secret_password_123",
+    "encryption_method": "md5",
+    "debug": true
+  },
+  "logger": {
+    "log_level": "trace"
+  },
+  "external_api": {
+    "api_key": "${ENV_API_KEY}",
+    "secret": "vault://secret/path/to/token"
+  }
+}

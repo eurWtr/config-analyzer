@@ -1,0 +1,22 @@
+app:
+  name: "my-vulnerable-app"
+  debug_mode: "yes"
+
+network:
+  bind: "0.0.0.0"
+  ssl_verify: "off"
+
+auth:
+  # Симуляция жестко закодированного JWT токена
+  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  cipher_suite: "RC4"
+
+api:
+  # Приватный ключ прямо в конфиге
+  private-key: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQ...
+    -----END PRIVATE KEY-----
+
+logging:
+  level: "DEBUG"

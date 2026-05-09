@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package analyzer;
+
+option go_package = "./api/proto/analyzerpb";
+
+// Сервис анализа конфигурации
+service AnalyzerService {
+  // Выполняет анализ входной конфигурации и возвращает найденные проблемы
+  rpc Analyze (AnalyzeRequest) returns (AnalyzeResponse);
+}
+
+// Запрос на анализ конфигурации
+message AnalyzeRequest {
+  // Конфигурация в виде строки (JSON/YAML)
+  string config = 1;
+}
+
+// Ответ после анализа конфигурации
+message AnalyzeResponse {
+  // Список найденных проблем/замечаний
+  repeated Issue issues = 1;
+  // Общее количество найденных проблем
+  int32 count = 2;
+}
+
+// Проблема, найденная при анализе
+message Issue {
+
+  // Уровень критичности
+  string severity = 1;
+
+  // Описание проблемы
+  string description = 2;
+
+  // Рекомендация по исправлению
+  string recommendation = 3;
+
+  // Путь/место в конфигурации, где найдена проблема
+  string path = 4;
+}
