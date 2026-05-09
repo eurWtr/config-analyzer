@@ -33,27 +33,27 @@ func NewGRPCServer(addr string, a *analyzer.Analyzer) *GRPCServer {
 func (s *GRPCServer) Start() error {
 	lis, err := net.Listen("tcp", s.addr)
 	if err != nil {
-		return fmt.Errorf("failed to start listening: %w", err)
+		return fmt.Errorf("не удалось запустить gRPC сервер: %w", err)
 	}
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterAnalyzerServiceServer(grpcServer, s)
 
-	fmt.Printf("gRPC server started on %s\n", s.addr)
+	fmt.Printf("gRPC-сервер запущен на %s\n", s.addr)
 	return grpcServer.Serve(lis)
 }
 
 // Analyze implements the gRPC method for configuration analysis.
 func (s *GRPCServer) Analyze(ctx context.Context, req *pb.AnalyzeRequest) (*pb.AnalyzeResponse, error) {
 	if req.Config == "" {
-		return nil, fmt.Errorf("config field is required")
+		return nil, fmt.Errorf("поле config обязательно")
 	}
 
 	result, err := s.analyzer.Analyze(ctx, models.AnalysisRequest{
 		Reader: strings.NewReader(req.Config),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("analysis error: %w", err)
+		return nil, fmt.Errorf("ошибка анализа: %w", err)
 	}
 
 	resp := &pb.AnalyzeResponse{

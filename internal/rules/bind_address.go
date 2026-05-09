@@ -45,8 +45,8 @@ func (r *BindAddressRule) Check(config map[string]interface{}, _ string) []model
 		if strings.Contains(strVal, "0.0.0.0") {
 			issues = append(issues, models.Issue{
 				Severity:       models.MEDIUM,
-				Description:    fmt.Sprintf("service bound to 0.0.0.0 (key: %s), accessible on all interfaces", key),
-				Recommendation: "Limit binding to a specific interface (e.g. 127.0.0.1) or use a firewall.",
+				Description:    fmt.Sprintf("сервис привязан к 0.0.0.0 (ключ: %s), доступен на всех интерфейсах", key),
+				Recommendation: "Ограничьте привязку конкретным интерфейсом (например, 127.0.0.1) или используйте firewall.",
 				Path:           key,
 			})
 		}

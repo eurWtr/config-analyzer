@@ -27,8 +27,8 @@ func (r *DebugModeRule) Check(config map[string]interface{}, _ string) []models.
 			if boolVal, ok := toBool(value); ok && boolVal {
 				issues = append(issues, models.Issue{
 					Severity:       models.LOW,
-					Description:    fmt.Sprintf("debug mode enabled (key: %s)", key),
-					Recommendation: "Disable debug mode in production environments.",
+					Description:    fmt.Sprintf("включен debug-режим (ключ: %s)", key),
+					Recommendation: "Отключите debug-режим в production-окружении.",
 					Path:           key,
 				})
 			}
@@ -39,8 +39,8 @@ func (r *DebugModeRule) Check(config map[string]interface{}, _ string) []models.
 				if strings.EqualFold(strVal, "debug") || strings.EqualFold(strVal, "trace") {
 					issues = append(issues, models.Issue{
 						Severity:       models.LOW,
-						Description:    fmt.Sprintf("logging set to debug level (key: %s, value: %s)", key, strVal),
-						Recommendation: "Set a less verbose logging level (info or higher).",
+						Description:    fmt.Sprintf("логирование в debug-режиме (ключ: %s, значение: %s)", key, strVal),
+						Recommendation: "Поменяйте режим на более избирательный (info+).",
 						Path:           key,
 					})
 				}

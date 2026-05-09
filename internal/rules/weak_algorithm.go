@@ -63,8 +63,8 @@ func (r *WeakAlgorithmRule) Check(config map[string]interface{}, _ string) []mod
 			if strings.Contains(strVal, weakAlgo) {
 				issues = append(issues, models.Issue{
 					Severity:       severity,
-					Description:    fmt.Sprintf("algorithm is too weak - %s (key: %s)", strings.ToUpper(fmt.Sprintf("%v", value)), key),
-					Recommendation: "Replace it with a stronger algorithm (e.g. SHA-256, AES-256).",
+					Description:    fmt.Sprintf("слишком слабый алгоритм - %s (ключ: %s)", strings.ToUpper(fmt.Sprintf("%v", value)), key),
+					Recommendation: "Замените его на более безопасный (например, SHA-256, AES-256).",
 					Path:           key,
 				})
 				break

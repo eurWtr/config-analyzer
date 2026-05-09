@@ -49,8 +49,8 @@ func (r *TLSDisabledRule) Check(config map[string]interface{}, _ string) []model
 			if boolVal, ok := toBool(value); ok && boolVal {
 				issues = append(issues, models.Issue{
 					Severity:       models.HIGH,
-					Description:    fmt.Sprintf("TLS verification is disabled (key: %s)", key),
-					Recommendation: "Enable TLS certificate verification to protect against MITM attacks.",
+					Description:    fmt.Sprintf("отключена TLS-верификация (ключ: %s)", key),
+					Recommendation: "Включите проверку TLS-сертификатов для защиты от MITM-атак.",
 					Path:           key,
 				})
 			}
@@ -63,8 +63,8 @@ func (r *TLSDisabledRule) Check(config map[string]interface{}, _ string) []model
 			if boolVal, ok := toBool(value); ok && !boolVal {
 				issues = append(issues, models.Issue{
 					Severity:       models.HIGH,
-					Description:    fmt.Sprintf("TLS/SSL is disabled (key: %s)", key),
-					Recommendation: "Enable TLS to encrypt traffic.",
+					Description:    fmt.Sprintf("TLS/SSL отключен (ключ: %s)", key),
+					Recommendation: "Включите TLS для шифрования трафика.",
 					Path:           key,
 				})
 			}

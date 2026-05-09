@@ -52,7 +52,7 @@ func (s *HTTPServer) Start() error {
 	mux.HandleFunc("/analyze", s.handleAnalyze)
 	mux.HandleFunc("/health", s.handleHealth)
 
-	slog.Info("HTTP server started", "port", s.addr)
+	slog.Info("HTTP-сервер запущен", "port", s.addr)
 	return http.ListenAndServe(s.addr, mux)
 }
 
@@ -68,7 +68,7 @@ func (s *HTTPServer) handleAnalyze(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
 		return
 	}
 	defer r.Body.Close()
@@ -76,8 +76,8 @@ func (s *HTTPServer) handleAnalyze(w http.ResponseWriter, r *http.Request) {
 	var req analyzeRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		slog.Error("Request parsing error", "error", err)
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		slog.Error("Ошибка парсинга запроса", "error", err)
+		http.Error(w, "Невалидный JSON", http.StatusBadRequest)
 		return
 	}
 
@@ -89,8 +89,8 @@ func (s *HTTPServer) handleAnalyze(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		slog.Error("Analysis error", "error", err)
-		http.Error(w, "Error: "+err.Error(), http.StatusUnprocessableEntity)
+		slog.Error("Ошибка анализа", "error", err)
+		http.Error(w, "Ошибка: "+err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -108,7 +108,7 @@ func (s *HTTPServer) handleAnalyze(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	slog.Info("Request processed", "duration_ms", time.Since(start).Milliseconds(), "issues", resp.Count)
+	slog.Info("Запрос обработан", "duration_ms", time.Since(start).Milliseconds(), "issues", resp.Count)
 
 	w.Header().Set("Content-Type", "application/json")
 	if result.HasIssues() {

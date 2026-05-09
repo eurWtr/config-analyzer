@@ -42,8 +42,8 @@ func (r *PlainPasswordRule) Check(config map[string]interface{}, _ string) []mod
 					!strings.EqualFold(strVal, "***") {
 					issues = append(issues, models.Issue{
 						Severity:       models.HIGH,
-						Description:    fmt.Sprintf("found plaintext password/secret (key: %s)", key),
-						Recommendation: "Use environment variables, a vault, or other secure secret storage methods.",
+						Description:    fmt.Sprintf("обнаружен пароль/секрет в открытом виде (ключ: %s)", key),
+						Recommendation: "Используйте переменные окружения, vault или другие безопасные способы хранения секретов.",
 						Path:           key,
 					})
 				}
