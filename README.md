@@ -26,7 +26,7 @@
 
 1. Склонируйте репозиторий и перейдите в папку:
    ```bash
-   git clone <ссылка-на-ваш-репозиторий>
+   git clone https://github.com/eurWtr/config-analyzer.git
    cd config-analyzer
    ```
 
