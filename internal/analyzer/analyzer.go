@@ -8,26 +8,26 @@ import (
 	"fmt"
 )
 
-// Analyzer — основной компонент для анализа конфигураций.
+// Analyzer is the core component for configuration analysis.
 type Analyzer struct {
 	registry *rules.Registry
 }
 
-// New создаёт новый анализатор с набором правил по умолчанию.
+// New creates a new analyzer with a set of default rules.
 func New() *Analyzer {
 	return &Analyzer{
 		registry: rules.NewRegistry(),
 	}
 }
 
-// NewWithRegistry создаёт анализатор с пользовательским реестром правил.
+// NewWithRegistry creates an analyzer with a custom rules registry.
 func NewWithRegistry(registry *rules.Registry) *Analyzer {
 	return &Analyzer{
 		registry: registry,
 	}
 }
 
-// Analyze анализирует конфигурацию из сырых данных.
+// Analyze analyzes configuration from raw data.
 func (a *Analyzer) Analyze(ctx context.Context, req models.AnalysisRequest) (*models.AnalysisResult, error) {
 	type parseResult struct {
 		config map[string]interface{}
@@ -44,7 +44,7 @@ func (a *Analyzer) Analyze(ctx context.Context, req models.AnalysisRequest) (*mo
 
 	select {
 	case <-ctx.Done():
-		return nil, fmt.Errorf("анализ прерван (таймаут/отмена): %w", ctx.Err())
+		return nil, fmt.Errorf("analysis aborted (timeout/cancel): %w", ctx.Err())
 	case res := <-resultCh:
 		if res.err != nil {
 			return nil, res.err
@@ -60,7 +60,7 @@ func (a *Analyzer) Analyze(ctx context.Context, req models.AnalysisRequest) (*mo
 	}, nil
 }
 
-// Registry возвращает реестр правил для расширения.
+// Registry returns the rules registry for extension.
 func (a *Analyzer) Registry() *rules.Registry {
 	return a.registry
 }

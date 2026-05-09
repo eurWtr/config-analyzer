@@ -7,15 +7,15 @@ import (
 	"config-analyzer/internal/models"
 )
 
-// TLSDisabledRule проверяет отключение TLS/SSL.
+// TLSDisabledRule checks for disabled TLS/SSL.
 type TLSDisabledRule struct{}
 
-// Name возвращает имя правила
+// Name returns the rule name
 func (r *TLSDisabledRule) Name() string {
 	return "tls-disabled"
 }
 
-// tlsKeys - список ключевых слов для определения
+// tlsKeys - list of keywords used to identify TLS/SSL related settings
 var tlsKeys = []string{
 	"tls", "ssl", "https", "tls_verify", "tls-verify", "tlsverify",
 	"ssl_verify", "ssl-verify", "sslverify", "verify_ssl", "verify-ssl",
@@ -24,7 +24,7 @@ var tlsKeys = []string{
 	"skip-tls-verify",
 }
 
-// Check проверяет конфигурацию и возвращает найденные проблемы
+// Check inspects the configuration and returns found issues
 func (r *TLSDisabledRule) Check(config map[string]interface{}, _ string) []models.Issue {
 	var issues []models.Issue
 	flat := flatten("", config)
@@ -44,27 +44,27 @@ func (r *TLSDisabledRule) Check(config map[string]interface{}, _ string) []model
 			continue
 		}
 
-		// Проверяем ключи типа "insecure", "skip_verify" — опасно, если true
+		// Check keys like "insecure", "skip_verify" — dangerous if true
 		if strings.Contains(lowerKey, "insecure") || strings.Contains(lowerKey, "skip") {
 			if boolVal, ok := toBool(value); ok && boolVal {
 				issues = append(issues, models.Issue{
 					Severity:       models.HIGH,
-					Description:    fmt.Sprintf("отключена TLS-верификация (ключ: %s)", key),
-					Recommendation: "Включите проверку TLS-сертификатов для защиты от MITM-атак.",
+					Description:    fmt.Sprintf("TLS verification is disabled (key: %s)", key),
+					Recommendation: "Enable TLS certificate verification to protect against MITM attacks.",
 					Path:           key,
 				})
 			}
 			continue
 		}
 
-		// Проверяем ключи типа "tls.enabled", "ssl" — опасно, если false
+		// Check keys like "tls.enabled", "ssl" — dangerous if false
 		if strings.Contains(lowerKey, "enabled") || strings.HasSuffix(lowerKey, "tls") ||
 			strings.HasSuffix(lowerKey, "ssl") || strings.HasSuffix(lowerKey, "https") {
 			if boolVal, ok := toBool(value); ok && !boolVal {
 				issues = append(issues, models.Issue{
 					Severity:       models.HIGH,
-					Description:    fmt.Sprintf("TLS/SSL отключен (ключ: %s)", key),
-					Recommendation: "Включите TLS для шифрования трафика.",
+					Description:    fmt.Sprintf("TLS/SSL is disabled (key: %s)", key),
+					Recommendation: "Enable TLS to encrypt traffic.",
 					Path:           key,
 				})
 			}

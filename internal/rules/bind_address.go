@@ -7,21 +7,21 @@ import (
 	"config-analyzer/internal/models"
 )
 
-// BindAddressRule проверяет привязку к 0.0.0.0.
+// BindAddressRule checks for services bound to 0.0.0.0.
 type BindAddressRule struct{}
 
-// Name возвращает имя правила
+// Name returns the rule name
 func (r *BindAddressRule) Name() string {
 	return "bind-address"
 }
 
-// addressKeys список ключевых слов для поиска нужных полей
+// addressKeys is a list of keywords to find address-related fields
 var addressKeys = []string{
 	"host", "bind", "address", "addr", "listen", "bind_address",
 	"bind-address", "listen_address", "listen-address", "server",
 }
 
-// Check проверяет конфигурацию и возвращает найденные проблемы
+// Check inspects the configuration and returns found issues
 func (r *BindAddressRule) Check(config map[string]interface{}, _ string) []models.Issue {
 	var issues []models.Issue
 	flat := flatten("", config)
@@ -45,8 +45,8 @@ func (r *BindAddressRule) Check(config map[string]interface{}, _ string) []model
 		if strings.Contains(strVal, "0.0.0.0") {
 			issues = append(issues, models.Issue{
 				Severity:       models.MEDIUM,
-				Description:    fmt.Sprintf("сервис привязан к 0.0.0.0 (ключ: %s), доступен на всех интерфейсах", key),
-				Recommendation: "Ограничьте привязку конкретным интерфейсом (например, 127.0.0.1) или используйте firewall.",
+				Description:    fmt.Sprintf("service bound to 0.0.0.0 (key: %s), accessible on all interfaces", key),
+				Recommendation: "Limit binding to a specific interface (e.g. 127.0.0.1) or use a firewall.",
 				Path:           key,
 			})
 		}

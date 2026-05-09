@@ -7,15 +7,15 @@ import (
 	"config-analyzer/internal/models"
 )
 
-// WeakAlgorithmRule проверяет использование устаревших или небезопасных алгоритмов.
+// WeakAlgorithmRule checks for the use of deprecated or insecure algorithms.
 type WeakAlgorithmRule struct{}
 
-// Name возвращает имя правила
+// Name returns the rule name
 func (r *WeakAlgorithmRule) Name() string {
 	return "weak-algorithm"
 }
 
-// weakAlgorithms — список небезопасных алгоритмов с уровнем серьёзности.
+// weakAlgorithms — list of insecure algorithms with severity levels.
 var weakAlgorithms = map[string]models.Severity{
 	"md5":       models.HIGH,
 	"md4":       models.HIGH,
@@ -30,14 +30,14 @@ var weakAlgorithms = map[string]models.Severity{
 	"plaintext": models.HIGH,
 }
 
-// algorithmKeys - список ключевых слов, используемых для идентификации алгоритмов хеширования и шифрования
+// algorithmKeys - list of keywords used to identify hashing and encryption algorithm settings
 var algorithmKeys = []string{
 	"algorithm", "algo", "cipher", "hash", "digest", "encryption",
 	"digest-algorithm", "digest_algorithm", "hash-algorithm", "hash_algorithm",
 	"cipher-suite", "cipher_suite", "encryption-method", "encryption_method",
 }
 
-// Check проверяет конфигурацию на проблемы, связанные с алгоритмами хеширования и шифрования
+// Check inspects the configuration for issues related to hashing and encryption algorithms
 func (r *WeakAlgorithmRule) Check(config map[string]interface{}, _ string) []models.Issue {
 	var issues []models.Issue
 	flat := flatten("", config)
@@ -63,8 +63,8 @@ func (r *WeakAlgorithmRule) Check(config map[string]interface{}, _ string) []mod
 			if strings.Contains(strVal, weakAlgo) {
 				issues = append(issues, models.Issue{
 					Severity:       severity,
-					Description:    fmt.Sprintf("слишком слабый алгоритм - %s (ключ: %s)", strings.ToUpper(fmt.Sprintf("%v", value)), key),
-					Recommendation: "Замените его на более безопасный (например, SHA-256, AES-256).",
+					Description:    fmt.Sprintf("algorithm is too weak - %s (key: %s)", strings.ToUpper(fmt.Sprintf("%v", value)), key),
+					Recommendation: "Replace it with a stronger algorithm (e.g. SHA-256, AES-256).",
 					Path:           key,
 				})
 				break

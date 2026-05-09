@@ -7,15 +7,15 @@ import (
 	"config-analyzer/internal/models"
 )
 
-// PlainPasswordRule проверяет наличие паролей в открытом виде.
+// PlainPasswordRule checks for plaintext passwords or secrets.
 type PlainPasswordRule struct{}
 
-// Name возвращает имя правила
+// Name returns the rule name
 func (r *PlainPasswordRule) Name() string {
 	return "plain-password"
 }
 
-// sensitiveKeys — ключевые слова, указывающие на секретные данные.
+// sensitiveKeys — keywords that indicate secret data.
 var sensitiveKeys = []string{
 	"password", "passwd", "pass", "secret", "api_key", "apikey",
 	"api-key", "token", "private_key", "private-key", "privatekey",
@@ -23,7 +23,7 @@ var sensitiveKeys = []string{
 	"secretkey", "credentials", "auth_token", "auth-token",
 }
 
-// Check проверяет конфигурацию и возвращает найденные проблемы
+// Check inspects the configuration and returns found issues
 func (r *PlainPasswordRule) Check(config map[string]interface{}, _ string) []models.Issue {
 	var issues []models.Issue
 	flat := flatten("", config)
@@ -42,8 +42,8 @@ func (r *PlainPasswordRule) Check(config map[string]interface{}, _ string) []mod
 					!strings.EqualFold(strVal, "***") {
 					issues = append(issues, models.Issue{
 						Severity:       models.HIGH,
-						Description:    fmt.Sprintf("обнаружен пароль/секрет в открытом виде (ключ: %s)", key),
-						Recommendation: "Используйте переменные окружения, vault или другие безопасные способы хранения секретов.",
+						Description:    fmt.Sprintf("found plaintext password/secret (key: %s)", key),
+						Recommendation: "Use environment variables, a vault, or other secure secret storage methods.",
 						Path:           key,
 					})
 				}

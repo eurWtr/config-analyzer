@@ -5,20 +5,20 @@ import (
 	"fmt"
 )
 
-// Rule определяет интерфейс правила проверки.
-// Для добавления нового правила достаточно реализовать этот интерфейс и зарегистрировать его.
+// Rule defines the interface for a validation rule.
+// To add a new rule implement this interface and register it.
 type Rule interface {
 	Name() string
 
 	Check(config map[string]interface{}, filePath string) []models.Issue
 }
 
-// Registry хранит зарегистрированные правила.
+// Registry holds registered rules.
 type Registry struct {
 	rules []Rule
 }
 
-// NewRegistry создаёт реестр с набором правил по умолчанию.
+// NewRegistry creates a registry with a set of default rules.
 func NewRegistry() *Registry {
 	r := &Registry{}
 
@@ -32,12 +32,12 @@ func NewRegistry() *Registry {
 	return r
 }
 
-// Register добавляет правило в реестр.
+// Register adds a rule to the registry.
 func (r *Registry) Register(rule Rule) {
 	r.rules = append(r.rules, rule)
 }
 
-// CheckAll применяет все зарегистрированные правила к конфигурации.
+// CheckAll applies all registered rules to the configuration.
 func (r *Registry) CheckAll(config map[string]interface{}, filePath string) []models.Issue {
 	var allIssues []models.Issue
 	for _, rule := range r.rules {
@@ -47,13 +47,13 @@ func (r *Registry) CheckAll(config map[string]interface{}, filePath string) []mo
 	return allIssues
 }
 
-// Rules возвращает список зарегистрированных правил.
+// Rules returns the list of registered rules.
 func (r *Registry) Rules() []Rule {
 	return r.rules
 }
 
-// flatten рекурсивно обходит вложенную map и возвращает плоскую map
-// с ключами вида "parent.child.key".
+// flatten recursively walks a nested map and returns a flat map
+// with keys like "parent.child.key".
 func flatten(prefix string, m map[string]interface{}) map[string]interface{} {
 	result := make(map[string]interface{})
 	for k, v := range m {

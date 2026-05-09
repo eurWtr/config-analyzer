@@ -18,14 +18,14 @@ import (
 
 func main() {
 
-	silent := flag.Bool("s", false, "Не выходить с ошибкой при наличии проблем")
-	silentLong := flag.Bool("silent", false, "Не выходить с ошибкой при наличии проблем")
-	stdin := flag.Bool("stdin", false, "Прочитать конфигурацию из stdin")
-	recursive := flag.Bool("r", false, "Рекурсивный анализ директории")
-	httpAddr := flag.String("http", "", "Запустить HTTP-сервер (например, :8080)")
-	grpcAddr := flag.String("grpc", "", "Запустить gRPC-сервер (например, :9090)")
-	outputFmt := flag.String("output", "text", "Формат вывода: text или json")
-	timeout := flag.Duration("timeout", 10*time.Second, "Таймаут анализа")
+	silent := flag.Bool("s", false, "Do not exit with error code when issues are found")
+	silentLong := flag.Bool("silent", false, "Do not exit with error code when issues are found")
+	stdin := flag.Bool("stdin", false, "Read configuration from stdin")
+	recursive := flag.Bool("r", false, "Recursively analyze a directory")
+	httpAddr := flag.String("http", "", "Start HTTP server (e.g. :8080)")
+	grpcAddr := flag.String("grpc", "", "Start gRPC server (e.g. :9090)")
+	outputFmt := flag.String("output", "text", "Output format: text or json")
+	timeout := flag.Duration("timeout", 10*time.Second, "Analysis timeout")
 
 	flag.Parse()
 
@@ -54,39 +54,39 @@ func main() {
 
 }
 
-// start запускает сервер в зависимости от выбранного режима
+// start launches the server depending on selected mode
 func start(httpAddr *string, grpcAddr *string, a *analyzer.Analyzer) {
 	if *httpAddr != "" {
-		slog.Info("Запуск HTTP-сервера", "port", *httpAddr)
+		slog.Info("Starting HTTP server", "port", *httpAddr)
 		srv := server.NewHTTPServer(*httpAddr, a)
 		if err := srv.Start(); err != nil {
-			slog.Error("Ошибка HTTP-сервера", "error", err)
+			slog.Error("HTTP server error", "error", err)
 			os.Exit(1)
 		}
 		return
 	}
 
 	if *grpcAddr != "" {
-		slog.Info("Запуск gRPC-сервера", "port", *httpAddr)
+		slog.Info("Starting gRPC server", "port", *httpAddr)
 		srv := server.NewGRPCServer(*grpcAddr, a)
 		if err := srv.Start(); err != nil {
-			slog.Error("Ошибка gRPC-сервера", "error", err)
+			slog.Error("gRPC server error", "error", err)
 			os.Exit(1)
 		}
 		return
 	}
 }
 
-// recursionScan запускает рекурсивную проверку
+// recursionScan runs recursive scanning
 func recursionScan(a *analyzer.Analyzer, isSilent bool) {
 	if flag.NArg() < 1 {
-		slog.Error("Использование: analyzer -r <директория>")
+		slog.Error("Usage: analyzer -r <directory>")
 		os.Exit(1)
 	}
 	dir := flag.Arg(0)
 	results, err := scanner.ScanDirectory(dir, a)
 	if err != nil {
-		slog.Error("Ошибка сканирования", "error", err)
+		slog.Error("Scanning error", "error", err)
 		os.Exit(1)
 	}
 
@@ -100,14 +100,14 @@ func recursionScan(a *analyzer.Analyzer, isSilent bool) {
 	}
 
 	if !hasIssues {
-		fmt.Println("Проблем не обнаружено.")
+		fmt.Println("No issues found.")
 	} else if !isSilent {
 		os.Exit(1)
 	}
 	return
 }
 
-// readConfig считывает конфиг
+// readConfig reads the configuration
 func readConfig(stdin *bool, a *analyzer.Analyzer, isSilent bool, timeout *time.Duration, outputFmt *string) {
 
 	var reader io.Reader
@@ -117,14 +117,14 @@ func readConfig(stdin *bool, a *analyzer.Analyzer, isSilent bool, timeout *time.
 		reader = os.Stdin
 	} else {
 		if flag.NArg() < 1 {
-			fmt.Fprintln(os.Stderr, "Использование: analyzer [флаги] <путь_к_файлу>")
+			fmt.Fprintln(os.Stderr, "Usage: analyzer [flags] <path_to_file>")
 			flag.PrintDefaults()
 			os.Exit(1)
 		}
 		filePath = flag.Arg(0)
-		file, err := os.Open(filePath) // Открываем поток
+		file, err := os.Open(filePath) // Open stream
 		if err != nil {
-			slog.Error("Ошибка открытия файла", "error", err)
+			slog.Error("File open error", "error", err)
 			os.Exit(1)
 		}
 		defer file.Close()
@@ -139,7 +139,7 @@ func readConfig(stdin *bool, a *analyzer.Analyzer, isSilent bool, timeout *time.
 		FilePath: filePath,
 	})
 	if err != nil {
-		slog.Error("Ошибка анализа", "error", err)
+		slog.Error("Analysis error", "error", err)
 		os.Exit(1)
 	}
 
@@ -153,22 +153,22 @@ func readConfig(stdin *bool, a *analyzer.Analyzer, isSilent bool, timeout *time.
 	}
 
 	if !result.HasIssues() {
-		fmt.Println("Проблем не обнаружено.")
+		fmt.Println("No issues found.")
 		return
 	}
 
 	if filePath != "" {
-		fmt.Printf("=== Анализ: %s ===\n", filePath)
+		fmt.Printf("=== Analysis: %s ===\n", filePath)
 	}
 	printIssues(result.Issues)
-	fmt.Printf("\nВсего проблем: %d\n", len(result.Issues))
+	fmt.Printf("\nTotal issues: %d\n", len(result.Issues))
 
 	if !isSilent {
 		os.Exit(1)
 	}
 }
 
-// printIssues выводит список найденных проблем
+// printIssues prints the list of found issues
 func printIssues(issues []models.Issue) {
 	for _, issue := range issues {
 		fmt.Println(issue.String())

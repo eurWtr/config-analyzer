@@ -26,13 +26,13 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name:        "Invalid syntax",
-			input:       `{"server": {"port": 8080}`, // пропущена закрывающая скобка
+			input:       `{"server": {"port": 8080}`, // missing closing brace
 			filename:    "config.json",
 			expectError: true,
 		},
 		{
 			name:        "JSON stream detection",
-			input:       `   {"key": "value"}`, // проверяем пропуск пробелов в начале
+			input:       `   {"key": "value"}`, // ensure leading spaces are handled
 			filename:    "",
 			expectError: false,
 		},
@@ -50,7 +50,7 @@ func TestParse(t *testing.T) {
 				t.Errorf("did not expect error, got: %v", err)
 			}
 
-			// Если ошибки нет, проверяем, что данные распарсились
+			// If no error, check that the data was parsed
 			if !tt.expectError && result == nil {
 				t.Errorf("expected result map, got nil")
 			}

@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-// Severity определяет уровень серьёзности проблемы.
+// Severity defines the severity level of an issue.
 type Severity int
 
 const (
@@ -27,15 +27,15 @@ func (s Severity) String() string {
 	}
 }
 
-// Issue представляет найденную проблему в конфигурации.
+// Issue represents a found configuration issue.
 type Issue struct {
 	Severity       Severity `json:"severity"`
 	Description    string   `json:"description"`
 	Recommendation string   `json:"recommendation"`
-	Path           string   `json:"path,omitempty"` // путь к ключу в конфиге
+	Path           string   `json:"path,omitempty"` // path to the key in the config
 }
 
-// String возвращает текстовое представление проблемы
+// String returns a textual representation of the issue
 func (i Issue) String() string {
 	s := fmt.Sprintf("%s: %s. %s", i.Severity, i.Description, i.Recommendation)
 	if i.Path != "" {
@@ -44,19 +44,19 @@ func (i Issue) String() string {
 	return s
 }
 
-// AnalysisRequest содержит данные для анализа.
+// AnalysisRequest holds data for analysis.
 type AnalysisRequest struct {
 	Reader   io.Reader
 	FilePath string
 }
 
-// AnalysisResult содержит результат анализа.
+// AnalysisResult contains the analysis result.
 type AnalysisResult struct {
 	FilePath string  `json:"file_path,omitempty"`
 	Issues   []Issue `json:"issues"`
 }
 
-// HasIssues проверяет наличие проблем
+// HasIssues checks whether any issues were found
 func (r AnalysisResult) HasIssues() bool {
 	return len(r.Issues) > 0
 }

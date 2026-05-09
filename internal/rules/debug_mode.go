@@ -7,15 +7,15 @@ import (
 	"config-analyzer/internal/models"
 )
 
-// DebugModeRule проверяет, включен ли debug-режим.
+// DebugModeRule checks whether debug mode is enabled.
 type DebugModeRule struct{}
 
-// Name возвращает имя правила
+// Name returns the rule name
 func (r *DebugModeRule) Name() string {
 	return "debug-mode"
 }
 
-// Check проверяет конфигурацию и возвращает найденные проблемы
+// Check inspects the configuration and returns found issues
 func (r *DebugModeRule) Check(config map[string]interface{}, _ string) []models.Issue {
 	var issues []models.Issue
 	flat := flatten("", config)
@@ -27,8 +27,8 @@ func (r *DebugModeRule) Check(config map[string]interface{}, _ string) []models.
 			if boolVal, ok := toBool(value); ok && boolVal {
 				issues = append(issues, models.Issue{
 					Severity:       models.LOW,
-					Description:    fmt.Sprintf("включен debug-режим (ключ: %s)", key),
-					Recommendation: "Отключите debug-режим в production-окружении.",
+					Description:    fmt.Sprintf("debug mode enabled (key: %s)", key),
+					Recommendation: "Disable debug mode in production environments.",
 					Path:           key,
 				})
 			}
@@ -39,8 +39,8 @@ func (r *DebugModeRule) Check(config map[string]interface{}, _ string) []models.
 				if strings.EqualFold(strVal, "debug") || strings.EqualFold(strVal, "trace") {
 					issues = append(issues, models.Issue{
 						Severity:       models.LOW,
-						Description:    fmt.Sprintf("логирование в debug-режиме (ключ: %s, значение: %s)", key, strVal),
-						Recommendation: "Поменяйте режим на более избирательный (info+).",
+						Description:    fmt.Sprintf("logging set to debug level (key: %s, value: %s)", key, strVal),
+						Recommendation: "Set a less verbose logging level (info or higher).",
 						Path:           key,
 					})
 				}
@@ -51,7 +51,7 @@ func (r *DebugModeRule) Check(config map[string]interface{}, _ string) []models.
 	return issues
 }
 
-// toBool пытается привести значение к логическому типу
+// toBool attempts to coerce a value to boolean
 func toBool(v interface{}) (bool, bool) {
 	switch val := v.(type) {
 	case bool:

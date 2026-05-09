@@ -12,20 +12,20 @@ import (
 	"config-analyzer/internal/models"
 )
 
-// supportedExtensions — расширения файлов, которые будут проанализированы.
+// supportedExtensions — file extensions that will be analyzed.
 var supportedExtensions = map[string]bool{
 	".json": true,
 	".yaml": true,
 	".yml":  true,
 }
 
-// ScanDirectory рекурсивно сканирует директорию и анализирует конфигурационные файлы.
+// ScanDirectory recursively scans a directory and analyzes configuration files.
 func ScanDirectory(dir string, a *analyzer.Analyzer) ([]models.AnalysisResult, error) {
 	var results []models.AnalysisResult
 
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			slog.Warn("Ошибка доступа к пути", "path", path, "error", err)
+			slog.Warn("path access error", "path", path, "error", err)
 			return nil
 		}
 
@@ -40,7 +40,7 @@ func ScanDirectory(dir string, a *analyzer.Analyzer) ([]models.AnalysisResult, e
 
 		file, err := os.Open(path)
 		if err != nil {
-			slog.Warn("Не удалось открыть файл", "file", path, "error", err)
+			slog.Warn("failed to open file", "file", path, "error", err)
 			return nil
 		}
 		defer file.Close()
@@ -54,7 +54,7 @@ func ScanDirectory(dir string, a *analyzer.Analyzer) ([]models.AnalysisResult, e
 		})
 
 		if err != nil {
-			slog.Warn("Ошибка анализа файла", "file", path, "error", err)
+			slog.Warn("file analysis error", "file", path, "error", err)
 			return nil
 		}
 

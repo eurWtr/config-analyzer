@@ -12,13 +12,13 @@ import (
 	"config-analyzer/internal/models"
 )
 
-// HTTPServer предоставляет REST API для анализа конфигураций.
+// HTTPServer provides a REST API for analyzing configurations.
 type HTTPServer struct {
 	analyzer *analyzer.Analyzer
 	addr     string
 }
 
-// NewHTTPServer создаёт новый HTTP-сервер.
+// NewHTTPServer creates a new HTTP server.
 func NewHTTPServer(addr string, a *analyzer.Analyzer) *HTTPServer {
 	return &HTTPServer{
 		analyzer: a,
@@ -26,19 +26,19 @@ func NewHTTPServer(addr string, a *analyzer.Analyzer) *HTTPServer {
 	}
 }
 
-// analyzeRequest — структура запроса для REST API.
+// analyzeRequest represents the request structure for the REST API.
 type analyzeRequest struct {
 	Config string `json:"config"`
 	Format string `json:"format"`
 }
 
-// analyzeResponse — структура ответа REST API.
+// analyzeResponse represents the structure of a REST API response.
 type analyzeResponse struct {
 	Issues []issueResponse `json:"issues"`
 	Count  int             `json:"count"`
 }
 
-// issueResponse представляет структуру одной проблемы
+// issueResponse represents the structure of one problem.
 type issueResponse struct {
 	Severity       string `json:"severity"`
 	Description    string `json:"description"`
@@ -46,29 +46,29 @@ type issueResponse struct {
 	Path           string `json:"path,omitempty"`
 }
 
-// Start запускает HTTP-сервер.
+// Start starts the HTTP server.
 func (s *HTTPServer) Start() error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/analyze", s.handleAnalyze)
 	mux.HandleFunc("/health", s.handleHealth)
 
-	slog.Info("HTTP-сервер запущен", "port", s.addr)
+	slog.Info("HTTP server started", "port", s.addr)
 	return http.ListenAndServe(s.addr, mux)
 }
 
-// handleHealth возвращает состояние сервера
+// handleHealth returns the server state.
 func (s *HTTPServer) handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
 
-// handleAnalyze принимает запрос на анализ конфига
+// handleAnalyze accepts a request to analyze the config.
 func (s *HTTPServer) handleAnalyze(w http.ResponseWriter, r *http.Request) {
 
 	start := time.Now()
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	defer r.Body.Close()
@@ -76,8 +76,8 @@ func (s *HTTPServer) handleAnalyze(w http.ResponseWriter, r *http.Request) {
 	var req analyzeRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		slog.Error("Ошибка парсинга запроса", "error", err)
-		http.Error(w, "Невалидный JSON", http.StatusBadRequest)
+		slog.Error("Request parsing error", "error", err)
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
@@ -89,8 +89,8 @@ func (s *HTTPServer) handleAnalyze(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		slog.Error("Ошибка анализа", "error", err)
-		http.Error(w, "Ошибка: "+err.Error(), http.StatusUnprocessableEntity)
+		slog.Error("Analysis error", "error", err)
+		http.Error(w, "Error: "+err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -108,7 +108,7 @@ func (s *HTTPServer) handleAnalyze(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	slog.Info("Запрос обработан", "duration_ms", time.Since(start).Milliseconds(), "issues", resp.Count)
+	slog.Info("Request processed", "duration_ms", time.Since(start).Milliseconds(), "issues", resp.Count)
 
 	w.Header().Set("Content-Type", "application/json")
 	if result.HasIssues() {

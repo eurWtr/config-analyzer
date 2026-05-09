@@ -8,28 +8,28 @@ import (
 )
 
 func TestFilePermissionsRule_Check(t *testing.T) {
-	// Пропускаем этот тест на Windows, так как там другая система прав (ACL вместо POSIX)
+	// Skip this test on Windows because permissions work differently (ACL vs POSIX)
 	if runtime.GOOS == "windows" {
-		t.Skip("Пропуск тестирования прав файлов на Windows")
+		t.Skip("Skipping file permissions tests on Windows")
 	}
 
 	rule := &FilePermissionsRule{}
 
-	// Создаем временную папку для тестов
+	// Create a temporary directory for tests
 	tempDir := t.TempDir()
 
-	// Создаем безопасный файл (600 - чтение/запись только владельцу)
+	// Create a safe file (0600 - read/write only owner)
 	safeFile := filepath.Join(tempDir, "safe.yaml")
 	os.WriteFile(safeFile, []byte("test"), 0600)
 
-	// Создаем опасный файл (666 - чтение/запись всем)
+	// Create an unsafe file (0666 - read/write by everyone)
 	unsafeFile := filepath.Join(tempDir, "unsafe.yaml")
 	os.WriteFile(unsafeFile, []byte("test"), 0666)
 
 	tests := []struct {
 		name          string
 		filePath      string
-		expectedCount int // Количество найденных проблем
+		expectedCount int // Number of found issues
 	}{
 		{
 			name:          "Safe file permissions (0600)",
@@ -39,7 +39,7 @@ func TestFilePermissionsRule_Check(t *testing.T) {
 		{
 			name:          "Unsafe file permissions (0666)",
 			filePath:      unsafeFile,
-			expectedCount: 2, // Должен найти "чтение всем" (MEDIUM) и "запись всем" (HIGH)
+			expectedCount: 2, // Should find "readable by others" (MEDIUM) and "writable by others" (HIGH)
 		},
 		{
 			name:          "Empty file path",
@@ -50,7 +50,7 @@ func TestFilePermissionsRule_Check(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Это правило не использует саму мапу конфига, только путь к файлу
+			// This rule does not use the config map itself, only the file path
 			issues := rule.Check(nil, tt.filePath)
 
 			if len(issues) != tt.expectedCount {

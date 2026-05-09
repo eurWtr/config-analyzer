@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Format определяет формат конфигурационного файла.
+// Format defines the configuration file format.
 type Format int
 
 const (
@@ -19,8 +19,8 @@ const (
 	FormatYAML
 )
 
-// Parse парсит данные конфигурации в универсальную map-структуру.
-// Автоматически определяет формат (JSON или YAML).
+// Parse parses configuration data into a generic map structure.
+// It automatically detects the format (JSON or YAML).
 func Parse(r io.Reader, filename string) (map[string]interface{}, error) {
 	var format Format
 
@@ -46,11 +46,11 @@ func Parse(r io.Reader, filename string) (map[string]interface{}, error) {
 		if result, err := parseYAML(bufReader); err == nil {
 			return result, nil
 		}
-		return nil, fmt.Errorf("не удалось распарсить конфигурацию: неизвестный формат")
+		return nil, fmt.Errorf("failed to parse configuration: unknown format")
 	}
 }
 
-// DetectFormatByExtension определяет формат по расширению файла.
+// DetectFormatByExtension determines the format by file extension.
 func DetectFormatByExtension(filename string) Format {
 	lower := strings.ToLower(filename)
 	switch {
@@ -63,7 +63,7 @@ func DetectFormatByExtension(filename string) Format {
 	}
 }
 
-// detectFormat определяет формат входных данных
+// detectFormatFromStream detects the format of input data
 func detectFormatFromStream(r *bufio.Reader) Format {
 	peekBytes, err := r.Peek(100)
 	if err != nil && err != io.EOF {
@@ -77,20 +77,20 @@ func detectFormatFromStream(r *bufio.Reader) Format {
 	return FormatYAML
 }
 
-// parseJSON парсит JSON в map
+// parseJSON parses JSON into a map
 func parseJSON(r io.Reader) (map[string]interface{}, error) {
 	var result map[string]interface{}
 	if err := json.NewDecoder(r).Decode(&result); err != nil {
-		return nil, fmt.Errorf("ошибка потокового парсинга JSON: %w", err)
+		return nil, fmt.Errorf("streaming JSON parse error: %w", err)
 	}
 	return result, nil
 }
 
-// parseYAML парсит YAML в map
+// parseYAML parses YAML into a map
 func parseYAML(r io.Reader) (map[string]interface{}, error) {
 	var result map[string]interface{}
 	if err := yaml.NewDecoder(r).Decode(&result); err != nil {
-		return nil, fmt.Errorf("ошибка потокового парсинга YAML: %w", err)
+		return nil, fmt.Errorf("streaming YAML parse error: %w", err)
 	}
 	return result, nil
 }

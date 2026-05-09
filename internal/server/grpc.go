@@ -14,14 +14,14 @@ import (
 	pb "config-analyzer/api/proto/analyzerpb"
 )
 
-// GRPCServer предоставляет gRPC API для анализа конфигураций.
+// GRPCServer provides a gRPC API for configuration analysis.
 type GRPCServer struct {
 	pb.UnimplementedAnalyzerServiceServer
 	analyzer *analyzer.Analyzer
 	addr     string
 }
 
-// NewGRPCServer создаёт новый gRPC-сервер.
+// NewGRPCServer creates a new gRPC server.
 func NewGRPCServer(addr string, a *analyzer.Analyzer) *GRPCServer {
 	return &GRPCServer{
 		analyzer: a,
@@ -29,31 +29,31 @@ func NewGRPCServer(addr string, a *analyzer.Analyzer) *GRPCServer {
 	}
 }
 
-// Start запускает gRPC-сервер.
+// Start starts the gRPC server.
 func (s *GRPCServer) Start() error {
 	lis, err := net.Listen("tcp", s.addr)
 	if err != nil {
-		return fmt.Errorf("не удалось начать слушать: %w", err)
+		return fmt.Errorf("failed to start listening: %w", err)
 	}
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterAnalyzerServiceServer(grpcServer, s)
 
-	fmt.Printf("gRPC-сервер запущен на %s\n", s.addr)
+	fmt.Printf("gRPC server started on %s\n", s.addr)
 	return grpcServer.Serve(lis)
 }
 
-// Analyze реализует gRPC-метод анализа конфигурации.
+// Analyze implements the gRPC method for configuration analysis.
 func (s *GRPCServer) Analyze(ctx context.Context, req *pb.AnalyzeRequest) (*pb.AnalyzeResponse, error) {
 	if req.Config == "" {
-		return nil, fmt.Errorf("поле config обязательно")
+		return nil, fmt.Errorf("config field is required")
 	}
 
 	result, err := s.analyzer.Analyze(ctx, models.AnalysisRequest{
 		Reader: strings.NewReader(req.Config),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("ошибка анализа: %w", err)
+		return nil, fmt.Errorf("analysis error: %w", err)
 	}
 
 	resp := &pb.AnalyzeResponse{

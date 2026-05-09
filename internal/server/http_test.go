@@ -11,40 +11,40 @@ import (
 )
 
 func TestHTTPServer_handleAnalyze(t *testing.T) {
-	// 1. Создаем реальный инстанс анализатора
+	// 1. Create a real analyzer instance
 	a := analyzer.New()
 	srv := NewHTTPServer(":8080", a)
 
-	// 2. Формируем тело тестового запроса (JSON с "плохим" конфигом)
+	// 2. Prepare the test request body (JSON with a "bad" config)
 	reqBody := analyzeRequest{
 		Config: `{"db": {"password": "123"}}`,
 	}
 	bodyBytes, _ := json.Marshal(reqBody)
 
-	// 3. Создаем фейковый HTTP-запрос
+	// 3. Create a fake HTTP request
 	req, err := http.NewRequest(http.MethodPost, "/analyze", bytes.NewReader(bodyBytes))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// 4. Создаем Recorder, который запишет ответ сервера
+	// 4. Create a Recorder to capture the server response
 	rr := httptest.NewRecorder()
 
-	// 5. Вызываем хэндлер напрямую!
+	// 5. Call the handler directly!
 	srv.handleAnalyze(rr, req)
 
-	// 6. Проверяем HTTP статус
+	// 6. Check the HTTP status
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
 	}
 
-	// 7. Проверяем структуру ответа
+	// 7. Verify the response structure
 	var resp analyzeResponse
 	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
 		t.Fatalf("could not decode response: %v", err)
 	}
 
-	// Ожидаем, что сработает правило PlainPasswordRule
+	// Expect the PlainPasswordRule to trigger
 	if resp.Count != 1 {
 		t.Errorf("expected 1 issue, got %d", resp.Count)
 	}
@@ -57,7 +57,7 @@ func TestHTTPServer_handleAnalyze(t *testing.T) {
 func TestHTTPServer_WrongMethod(t *testing.T) {
 	srv := NewHTTPServer(":8080", analyzer.New())
 
-	// Отправляем GET вместо POST
+	// Send GET instead of POST
 	req, _ := http.NewRequest(http.MethodGet, "/analyze", nil)
 	rr := httptest.NewRecorder()
 
