@@ -4,38 +4,38 @@ package analyzer;
 
 option go_package = "./api/proto/analyzerpb";
 
-// Сервис анализа конфигурации
+// Configuration analysis service
 service AnalyzerService {
-  // Выполняет анализ входной конфигурации и возвращает найденные проблемы
+  // Performs analysis of the input configuration and returns found issues
   rpc Analyze (AnalyzeRequest) returns (AnalyzeResponse);
 }
 
-// Запрос на анализ конфигурации
+// Request for configuration analysis
 message AnalyzeRequest {
-  // Конфигурация в виде строки (JSON/YAML)
+  // Configuration as a string (JSON/YAML)
   string config = 1;
 }
 
-// Ответ после анализа конфигурации
+// Response after configuration analysis
 message AnalyzeResponse {
-  // Список найденных проблем/замечаний
+  // List of found issues/notes
   repeated Issue issues = 1;
-  // Общее количество найденных проблем
+  // Total number of found issues
   int32 count = 2;
 }
 
-// Проблема, найденная при анализе
+// Issue found during analysis
 message Issue {
 
-  // Уровень критичности
+  // Severity level
   string severity = 1;
 
-  // Описание проблемы
+  // Description of the issue
   string description = 2;
 
-  // Рекомендация по исправлению
+  // Recommendation for remediation
   string recommendation = 3;
 
-  // Путь/место в конфигурации, где найдена проблема
+  // Path/location in the configuration where the issue was found
   string path = 4;
 }
